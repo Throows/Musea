@@ -15,11 +15,10 @@ const researchName = 'Research';
 const Tab = createBottomTabNavigator();
 
 function MainContainer(){
-
     return (
         <NavigationContainer>
             <Tab.Navigator
-                initialRouteName={homeName}
+                initialRouteName={homeName}  
                 screenOptions={({route}) => ({
                     tabBarIcon: ({focused, color, size}) => {
                         let iconName;
@@ -36,7 +35,8 @@ function MainContainer(){
                         return <Ionicons name={iconName} size={size} color={color}/>
                     },
                     headerShown: false,
-                })}>
+                })}
+                >
 
                 <Tab.Screen name={researchName} component={ResearchScreen} />
                 <Tab.Screen name={homeName} component={HomeScreen} />
