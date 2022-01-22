@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Text, StyleSheet, SafeAreaView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import SearchBar from '../../components/SearchBar';
-import TrackPlayer from 'react-native-track-player';
-
+import { Audio } from 'expo-av';
 
 var track = {
-        url: 'http://192.168.1.138.3000', // Load media from the network
+        url: 'http://192.168.1.139:3000/music/enemy.mp3', // Load media from the network
         title: 'Enemy',
         artist: 'Imagine Dragons',
         album: 'Arcane',
@@ -15,34 +14,36 @@ var track = {
         duration: 213 // Duration in seconds
     };
 
-TrackPlayer.updateOptions({
-    stopWithApp: false,
-    capabilities: [TrackPlayer.CAPABILITY_PLAY, TrackPlayer.CAPABILITY_PAUSE],
-    compactCapabilities: [
-        TrackPlayer.CAPABILITY_PLAY,
-        TrackPlayer.CAPABILITY_PAUSE,
-    ],
-});
+
+const sound = new Audio.Sound();
+
 
 function HomeScreen({navigation}) {
 
     const [message, setMessage] = useState('Suggestions : ');
     
-    const setUpTrackPlayer = async () => {
+
+    async function playSound(url, duration) {
         try {
-            await TrackPlayer.setupPlayer();
-            await TrackPlayer.add(track);
-            console.log('Tracks added');
+            await sound.loadAsync({ uri: url }, {shouldPlay: true});
+            await sound.playAsync();
+            console.log('Sound Playing');
+            setTimeout(() => {
+                sound.unloadAsync();
+            }, 199800);
         } catch (e) {
             console.log(e);
         }
     };
 
     useEffect(() => {
-        setUpTrackPlayer();
-
-        return () => TrackPlayer.destroy();
-    }, []);
+        return sound
+            ? () => {
+                console.log('Unloading Sound');
+                sound.unloadAsync();
+            }
+            : undefined;
+    }, [sound]);
 
     return (
         <TouchableWithoutFeedback
@@ -50,7 +51,8 @@ function HomeScreen({navigation}) {
             accessible={false}>
             <SafeAreaView style={{flex: 1}}>
                 <SearchBar 
-                    onEndEditing={ () => { TrackPlayer.play(); }}/>
+                    onEndEditing={ () => { setMessage(`Playing : ${track.title}`);
+                    playSound(track.url, track.duration); }}/>
                 <Text
                     style={{ fontSize: 26, fontWeight: 'bold', textAlign: 'center' }}>{message}</Text>
                 
